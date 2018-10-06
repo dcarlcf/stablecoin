@@ -1,7 +1,10 @@
 from django.shortcuts import render
 from .send_paxos_dollar import prepare_paxos_dollar_tx
 from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 import decimal
+import binascii
 
 import web3 as w3
 import os
@@ -25,8 +28,8 @@ class PaxosUSDRequest(APIView):
         signed_transaction = prepare_paxos_dollar_tx(address_to_send_to,
                                                            private_key, amount_of_paxos_usd_to_send)
         print(signed_transaction)
-        # tx_hash = w3.eth.sendRawTransaction(signed_transaction.rawTransaction)
-        tx_hash = signed_transaction['hash']
+        tx_hash = w3.eth.sendRawTransaction(signed_transaction.rawTransaction)
+        # tx_hash = signed_transaction['hash']
         print(tx_hash)
         # gasPurchaseObejct = handleGasPurchaseObject(tx_hash, self.request.user,
         #                                             amount_of_gas_in_nftg_units,
@@ -34,5 +37,6 @@ class PaxosUSDRequest(APIView):
         #delegates resolving gas purchase object to celery so server can run
         # resolveGasPurchaseObjectTask.delay(gasPurchaseObejct.id)
         # print(gasPurchaseObejct.id)
-        print(tx_hash)
-        return Response(tx_hash, status=status.HTTP_200_OK)
+        tx_hash_string = ('0x' + binascii.hexlify(tx_hash).decode('utf-8'))
+        print(tx_hash_string)
+        return Response(tx_hash_string, status=status.HTTP_200_OK)

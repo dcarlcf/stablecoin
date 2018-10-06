@@ -38,17 +38,20 @@ def prepare_paxos_dollar_tx(to_address, private_key, amount_to_send):
     #grab nonce
     from_address = w3.toChecksumAddress(str(w3.eth.account.privateKeyToAccount(private_key).address))
     nonce = w3.eth.getTransactionCount(from_address)
+    balance = w3.eth.getBalance(from_address)
+    print(balance)
     #prepare transaction for transfer function
     #for now, gas limit is 1,000,000 and gas price is 3 Gwei
-    new_txn = contract.functions.transfer(
-        to_address,
-        token_id
-        ).buildTransaction({
-        'chainId':1,
-        'gas':1000000,
-        'gasPrice':w3.toWei('15','gwei'),
-        'nonce':nonce,
-        })
+    amount = int(amount_to_send* 4485035922634800)
+    print(amount)
+    new_txn = {
+    'to': to_address,
+    'value': w3.toHex(amount),
+    'gas': 21000,
+    'gasPrice': w3.toWei('15','gwei'),
+    'nonce': nonce,
+    'chainId': 1
+    }
     #sign transaction
     signed_txn = w3.eth.account.signTransaction(new_txn, private_key=private_key)
     #return signed transaction
